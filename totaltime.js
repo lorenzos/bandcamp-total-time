@@ -29,9 +29,11 @@ function formatTime(seconds) {
           ].join(":");
 }
 
-var times = document.querySelectorAll("div.title>span.time");
+var times = document.querySelectorAll("div.title>span.time"); // Desktop
+if (times.length == 0) times = document.querySelectorAll("#tracklist .duration"); // Mobile
 
-var tracklist = document.querySelector("table#track_table>tbody");
+var tracklist = document.querySelector("table#track_table>tbody"); // Desktop
+var albumMetadata = document.querySelector(".tralbum-info>#tralbum-metadata"); // Mobile
 
 var totaltime = 0;
 
@@ -39,16 +41,21 @@ for (var timeitem of times) {
     totaltime += timestrToSec(timeitem.textContent);
 }
 
-var tr = document.createElement("tr");
-// to align the total time with the track titles
-var dummyPlay = document.createElement("td");
-var dummyTrackNumber = document.createElement("td");
+if (tracklist) {
+  var tr = document.createElement("tr");
+  // to align the total time with the track titles
+  var dummyPlay = document.createElement("td");
+  var dummyTrackNumber = document.createElement("td");
+  var td = document.createElement("td");
+  var text = document.createTextNode("Total playing time: "+ formatTime(totaltime));
+  td.appendChild(text);
+  tr.appendChild(dummyPlay);
+  tr.appendChild(dummyTrackNumber);
+  tr.appendChild(td);
+  tr.setAttribute("id", "total-time");
+  tracklist.appendChild(tr);
+}
 
-var td = document.createElement("td");
-var text = document.createTextNode("Total playing time: "+ formatTime(totaltime));
-td.appendChild(text);
-tr.appendChild(dummyPlay);
-tr.appendChild(dummyTrackNumber);
-tr.appendChild(td);
-tr.setAttribute("id", "total-time");
-tracklist.appendChild(tr);
+if (albumMetadata) {
+  albumMetadata.innerText = times.length + " tracks, total " + formatTime(totaltime);
+}
